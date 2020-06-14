@@ -15,3 +15,6 @@ defuse: $(OBJ)
 
 clean:
 	rm -f bin/* *.o
+
+test: defuse
+	bin/defuse bomb

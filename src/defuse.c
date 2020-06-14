@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -16,7 +17,7 @@ main (int argc, char* argv[])
   char* addr;
   int fd;
   struct stat sb;
-  size_t length;
+  Bomb bomb;
 
   print_banner();
   if (argc != 2)
@@ -27,65 +28,21 @@ main (int argc, char* argv[])
   
   fd = open(argv[1], O_RDONLY);
   if (fd == -1)
-    {
-      perror("open");
-      return 1;
-    }
+    FATAL("Error opening file \"%s\"", argv[1]);
 
   if (fstat(fd, &sb) == -1)
-    {
-      perror("fstat");
-      return 1;
-    }
+    FATAL("Error reading stat of \"%s\"", argv[1]);
 
-  length = sb.st_size;
-  addr = mmap(NULL, length, PROT_READ, MAP_PRIVATE, fd, 0);
+  addr = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
   if (addr == MAP_FAILED)
-    {
-      perror("mmap");
-      return 1;
-    }
+    FATAL("Error loading \"%s\" into memory", argv[1]);
 
-  ///////
+#ifdef VERBOSE
+  DEBUG("Loaded the binary - Address: %p | File size: %ld bytes", (void *) addr, sb.st_size);
+#endif
 
-  Elf64_Ehdr elf_header;
-
-  memcpy(&elf_header, addr, sizeof(elf_header));
-  if (check_sanity_header(&elf_header) == -1)
-    {
-      printf("%s\n", error_message);
-      return 1;
-    }
-
-  // shstrtab for names of sections
-  Elf64_Shdr shstrtab;
-  if (elf_header.e_shstrndx == SHN_UNDEF) // Stripped shstrtab
-    return 1;
-
-  size_t off = elf_header.e_shoff + elf_header.e_shstrndx * elf_header.e_shentsize;
-  memcpy(&shstrtab, addr + off, sizeof(shstrtab));
-
-  char* table = addr + shstrtab.sh_offset;
-
-  for (int i = 0; i < elf_header.e_shnum; i++)
-    {
-      Elf64_Shdr section_header;
-      size_t offset = elf_header.e_shoff + i * elf_header.e_shentsize;
-      memcpy(&section_header, addr + offset, sizeof(section_header));
-    
-      if (section_header.sh_type == SHT_SYMTAB)
-        {
-          printf("Symbol table at section #%d - sh_name = %d\n", i, section_header.sh_name);
-          printf("Name;: %s\n", table + section_header.sh_name);
-        }
-
-      if (section_header.sh_type == SHT_STRTAB)
-        {
-          printf("String table at section #%d - sh_name = %d\n", i, section_header.sh_name);
-          printf("Name;: %s\n", table + section_header.sh_name);
-        }
-
-    }
+  if (parse_bomb(addr, &bomb) == -1)
+    FATAL("Error parsing \"%s\". The binary might be incorrect or corrupted.", argv[1]);
 
   return 0;
 }
