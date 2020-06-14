@@ -1,6 +1,9 @@
 #include "../include/bomb.h"
 
-int parse_bomb(void)
+int
+parse_bomb (char* addr, Bomb* bomb)
 {
-  return 69;
+  bomb->a = *((int *) addr);
+
+  return -1;
 }

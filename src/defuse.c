@@ -46,16 +46,46 @@ main (int argc, char* argv[])
       return 1;
     }
 
-  Elf64_Ehdr elf_header;
-  memcpy(&elf_header, addr, sizeof(elf_header));
+  ///////
 
+  Elf64_Ehdr elf_header;
+
+  memcpy(&elf_header, addr, sizeof(elf_header));
   if (check_sanity_header(&elf_header) == -1)
     {
       printf("%s\n", error_message);
       return 1;
     }
 
+  // shstrtab for names of sections
+  Elf64_Shdr shstrtab;
+  if (elf_header.e_shstrndx == SHN_UNDEF) // Stripped shstrtab
+    return 1;
 
+  size_t off = elf_header.e_shoff + elf_header.e_shstrndx * elf_header.e_shentsize;
+  memcpy(&shstrtab, addr + off, sizeof(shstrtab));
+
+  char* table = addr + shstrtab.sh_offset;
+
+  for (int i = 0; i < elf_header.e_shnum; i++)
+    {
+      Elf64_Shdr section_header;
+      size_t offset = elf_header.e_shoff + i * elf_header.e_shentsize;
+      memcpy(&section_header, addr + offset, sizeof(section_header));
+    
+      if (section_header.sh_type == SHT_SYMTAB)
+        {
+          printf("Symbol table at section #%d - sh_name = %d\n", i, section_header.sh_name);
+          printf("Name;: %s\n", table + section_header.sh_name);
+        }
+
+      if (section_header.sh_type == SHT_STRTAB)
+        {
+          printf("String table at section #%d - sh_name = %d\n", i, section_header.sh_name);
+          printf("Name;: %s\n", table + section_header.sh_name);
+        }
+
+    }
 
   return 0;
 }
