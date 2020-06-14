@@ -29,5 +29,3 @@
 
 void
 print_banner (void);
-
-#define VERBOSE
