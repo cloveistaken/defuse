@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "../include/util.h"
@@ -31,7 +32,7 @@ create_tmpfile (char* filename)
 {
   char* tmpdir;
   char* tmpfile;
-  int fd;
+  int fd, length;
 
   tmpdir = getenv("TMPDIR");
   if (tmpdir == NULL)
@@ -46,8 +47,9 @@ create_tmpfile (char* filename)
     return NULL;
   close(fd);
 
-  tmpfile = malloc(100);
-  snprintf(tmpfile, 100, "%s/%s", tmpdir, filename);
+  length = strlen(tmpdir) + strlen(filename) + 2;
+  tmpfile = malloc(length);
+  snprintf(tmpfile, length, "%s/%s", tmpdir, filename);
 
   /* No need to check exit status */
   unlink(tmpfile);
