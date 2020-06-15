@@ -16,11 +16,10 @@ bootstrap_phase_1 (Bomb* bomb)
   if (clean_copy(tmpfile, bomb) == -1)
     return -1;
 
-  return -1;
+  return 0;
 }
 
 void
 solve_phase_1 (void)
 {
-  printf("Solving phase_1\n");
 }

@@ -8,6 +8,12 @@
 #define FILE_TEST "dQw4w9WgXcQ"
 #define FILE_PHASE_1 "phase_1"
 
+#define INFO(...) do { \
+    printf(GREEN("[INFO] ")); \
+    printf(__VA_ARGS__); \
+    printf("\n"); \
+} while (0)
+
 #define DEBUG(...) do { \
     printf(BLUE("[DEBUG]")); \
     printf(__VA_ARGS__); \

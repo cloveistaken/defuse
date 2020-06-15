@@ -52,9 +52,7 @@ main (int argc, char* argv[])
   if (bootstrap(&bomb) == -1)
     FATAL("Error while doing bootstrap.");
 
-  solve_phase_1();
-
-  munmap(addr);
+  munmap(addr, sb.st_size);
   close(fd);
   return 0;
 }

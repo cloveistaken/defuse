@@ -60,9 +60,30 @@ parse_bomb (char* addr, Bomb* bomb)
 {
   Elf64_Ehdr hdr;
   Elf64_Shdr shdr_shstrtab, shdr_symtab;
-  int loaded_diff;
   char* table_sh_name;
   char* table_st_name;
+
+  char* section_name[] = {
+      ".text",
+      ".rodata",
+      ".data",
+  };
+
+  char* function_name[] = {
+      "main",
+      "phase_1",
+      "phase_2",
+      "phase_3",
+      "phase_4",
+      "phase_5",
+      "phase_6",
+      "sig_handler",
+      "explode_bomb",
+  };
+
+  char* object_name[] = {
+      "bomb_id",
+  };
 
   memcpy(&hdr, addr, sizeof(hdr));
 
@@ -76,6 +97,10 @@ parse_bomb (char* addr, Bomb* bomb)
       || hdr.e_machine != EM_X86_64)
     ERROR("Only 64-bit ELF (x86_64) is supported.");
 
+#ifdef VERBOSE
+  DEBUG("Parsing ELF sections:"); 
+#endif
+
   if (hdr.e_shstrndx == SHN_UNDEF)
     ERROR(".shstrtab not found. File might to be stripped.");
 
@@ -83,12 +108,11 @@ parse_bomb (char* addr, Bomb* bomb)
   table_sh_name = addr + shdr_shstrtab.sh_offset;
 
 #ifdef VERBOSE
-  DEBUG("Found .shstrtab: Section %d - Offset 0x%lx", hdr.e_shstrndx, shdr_shstrtab.sh_offset);
+  DEBUG("  %s  ->  0x%lx (Section %d)", ".shstrtab", shdr_shstrtab.sh_offset, hdr.e_shstrndx);
 #endif
 
   shdr_symtab.sh_type = SHT_NULL;
   table_st_name = NULL;
-  loaded_diff = -1;
   for (int i = 0; i < hdr.e_shnum; i++)
     {
       Elf64_Shdr shdr;
@@ -100,16 +124,7 @@ parse_bomb (char* addr, Bomb* bomb)
         {
           memcpy(&shdr_symtab, &shdr, sizeof(shdr));
 #ifdef VERBOSE
-          DEBUG("Found .symtab: Section %d - Offset 0x%lx", i, shdr.sh_offset);
-#endif
-        }
-
-      if (shdr.sh_type == SHT_PROGBITS
-          && strcmp(table_sh_name + shdr.sh_name, ".rodata") == 0)
-        {
-          loaded_diff = shdr.sh_addr - shdr.sh_offset;
-#ifdef VERBOSE
-          DEBUG("Found .text: Section %d - Offset 0x%lx - Loaded address 0x%lx", i, shdr.sh_offset, shdr.sh_addr);
+          DEBUG("  %s  ->  0x%lx (Section %d)", ".symtab", shdr.sh_offset, i);
 #endif
         }
 
@@ -118,8 +133,24 @@ parse_bomb (char* addr, Bomb* bomb)
         {
           table_st_name = addr + shdr.sh_offset;
 #ifdef VERBOSE
-          DEBUG("Found .strtab: Section %d - Offset 0x%lx", i, shdr.sh_offset);
+          DEBUG("  %s  ->  0x%lx (Section %d)", ".strtab", shdr.sh_offset, i);
 #endif
+        }
+
+      if (shdr.sh_type == SHT_PROGBITS)
+        {
+          for (int j = 0; j < NUM_SECTION; j++)
+            {
+              if (strcmp(table_sh_name + shdr.sh_name, section_name[j]) == 0)
+                {
+                  bomb->section[j].laddr = shdr.sh_addr;
+                  bomb->section[j].paddr = shdr.sh_offset;
+                  bomb->section[j].offset = shdr.sh_addr - shdr.sh_offset;
+#ifdef VERBOSE
+                  DEBUG("  %s  ->  0x%lx (Section %d)", section_name[j], shdr.sh_offset, i);
+#endif
+                }
+            }
         }
     }
 
@@ -129,8 +160,9 @@ parse_bomb (char* addr, Bomb* bomb)
   if (table_st_name == NULL)
     ERROR(".strtab not found. File might be stripped.");
 
-  if (loaded_diff == -1)
-    ERROR(".text not found. File might be stripped.");
+#ifdef VERBOSE
+  DEBUG("Parsing ELF symbols:");
+#endif
 
   for (unsigned int i = 0; i < shdr_symtab.sh_size / shdr_symtab.sh_entsize; i++)
     {
@@ -141,17 +173,43 @@ parse_bomb (char* addr, Bomb* bomb)
       if (sym.st_name == STN_UNDEF)
         continue;
 
-      if (1
-          && strcmp(table_st_name + sym.st_name, "explode_bomb") == 0)
+      if ((sym.st_info & 0x0F) == STT_FUNC)
         {
-          printf("     %s\n", table_st_name + sym.st_name);
-          printf("st_info = %d\n", sym.st_info);
-          printf("st_shndx = %d\n", sym.st_shndx);
-          printf("st_value = %p\n", (void *)sym.st_value);
-          printf("st_size = %zd\n", sym.st_size);
+          for (int j = 0; j < NUM_FUNCTION; j++)
+            {
+              if (strcmp(table_st_name + sym.st_name, function_name[j]) == 0)
+                {
+                  bomb->function[j].laddr = 0;
+                  bomb->function[j].paddr = 0;
+                  bomb->function[j].size = sym.st_size;
+#ifdef VERBOSE
+                  DEBUG("  %s  ->  0x%lx", function_name[j], sym.st_value);
+#endif
+                }
+            }
         }
+
+      if ((sym.st_info & 0x0F) == STT_OBJECT)
+        {
+          for(int j = 0; j < NUM_OBJECT; j++)
+            {
+              if (strcmp(table_st_name + sym.st_name, object_name[j]) == 0)
+                {
+                  bomb->object[j].laddr = 0;
+                  bomb->object[j].paddr = 0;
+                  bomb->object[j].size = sym.st_size;
+                }
+            }
+        }
+
+      /*
+         printf("     %s\n", table_st_name + sym.st_name);
+         printf("st_info = %d\n", sym.st_info);
+         printf("st_shndx = %d\n", sym.st_shndx);
+         printf("st_value = %p\n", (void *)sym.st_value);
+         printf("st_size = %zd\n", sym.st_size);
+         */
     }
 
-  printf("%ld\n", bomb->size);
   return 0;
 }
