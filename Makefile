@@ -46,4 +46,4 @@ build/%-debug.o: src/%.c $(HEADERS)
 remake: clean all
 
 clean:
-	rm -f bin/* build/*.o
+	rm -f bin/* build/* tmp/*
