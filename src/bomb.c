@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "../include/phase_1.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -15,12 +16,14 @@ bootstrap (void)
 {
   char* tmpfile_test;
 
-  tmpfile_test = "dQw4w9WgXcQ";
-  tmpfile_test = create_tmpfile(tmpfile_test);
+  tmpfile_test = create_tmpfile("dQw4w9WgXcQ");
   if (tmpfile_test == NULL)
     ERROR("Can't create temporary file.");
+
   unlink(tmpfile_test);
   free(tmpfile_test);
+
+  bootstrap_phase_1();
 
   return 0;
 }
