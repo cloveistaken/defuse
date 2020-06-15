@@ -98,7 +98,7 @@ parse_bomb (char* addr, Bomb* bomb)
     ERROR("Only 64-bit ELF (x86_64) is supported.");
 
 #ifdef VERBOSE
-  DEBUG("Parsing ELF sections:"); 
+  INFO("Parsing ELF sections..."); 
 #endif
 
   if (hdr.e_shstrndx == SHN_UNDEF)
@@ -106,10 +106,6 @@ parse_bomb (char* addr, Bomb* bomb)
 
   shdr_shstrtab = *(Elf64_Shdr*) (addr + (hdr.e_shoff + hdr.e_shstrndx * hdr.e_shentsize));
   table_sh_name = addr + shdr_shstrtab.sh_offset;
-
-#ifdef VERBOSE
-  DEBUG(FORMAT_DEBUG_SECTION, ".shstrtab", shdr_shstrtab.sh_offset, hdr.e_shstrndx);
-#endif
 
   shdr_symtab.sh_type = SHT_NULL;
   table_st_name = NULL;
@@ -121,21 +117,11 @@ parse_bomb (char* addr, Bomb* bomb)
 
       if (shdr.sh_type == SHT_SYMTAB
           && strcmp(table_sh_name + shdr.sh_name, ".symtab") == 0)
-        {
-          memcpy(&shdr_symtab, &shdr, sizeof(shdr));
-#ifdef VERBOSE
-          DEBUG(FORMAT_DEBUG_SECTION, ".symtab", shdr.sh_offset, i);
-#endif
-        }
+        memcpy(&shdr_symtab, &shdr, sizeof(shdr));
 
       if (shdr.sh_type == SHT_STRTAB
           && strcmp(table_sh_name + shdr.sh_name, ".strtab") == 0)
-        {
-          table_st_name = addr + shdr.sh_offset;
-#ifdef VERBOSE
-          DEBUG(FORMAT_DEBUG_SECTION, ".strtab", shdr.sh_offset, i);
-#endif
-        }
+        table_st_name = addr + shdr.sh_offset;
 
       if (shdr.sh_type == SHT_PROGBITS)
         {
@@ -143,12 +129,10 @@ parse_bomb (char* addr, Bomb* bomb)
             {
               if (strcmp(table_sh_name + shdr.sh_name, section_name[j]) == 0)
                 {
+                  bomb->section[j].ndx = i;
                   bomb->section[j].laddr = shdr.sh_addr;
                   bomb->section[j].paddr = shdr.sh_offset;
                   bomb->section[j].offset = shdr.sh_addr - shdr.sh_offset;
-#ifdef VERBOSE
-                  DEBUG(FORMAT_DEBUG_SECTION, section_name[j], shdr.sh_offset, i);
-#endif
                 }
             }
         }
@@ -161,7 +145,16 @@ parse_bomb (char* addr, Bomb* bomb)
     ERROR(".strtab not found. File might be stripped.");
 
 #ifdef VERBOSE
-  DEBUG("Parsing ELF symbols:");
+  DEBUG("Sections:");
+  for (int i = 0; i < NUM_SECTION; i++)
+    DEBUG(FORMAT_DEBUG_SECTION, section_name[i],
+          bomb->section[i].laddr, bomb->section[i].paddr, bomb->section[i].ndx);
+#endif
+  
+  // TODO: Add a check here
+
+#ifdef VERBOSE
+  INFO("Parsing ELF symbols...");
 #endif
 
   for (unsigned int i = 0; i < shdr_symtab.sh_size / shdr_symtab.sh_entsize; i++)
@@ -179,40 +172,42 @@ parse_bomb (char* addr, Bomb* bomb)
             {
               if (strcmp(table_st_name + sym.st_name, function_name[j]) == 0)
                 {
-                  bomb->function[j].laddr = 0;
-                  bomb->function[j].paddr = 0;
+                  bomb->function[j].laddr = sym.st_value;
+                  bomb->function[j].paddr = sym.st_value - bomb->section[TEXT].offset;
                   bomb->function[j].size = sym.st_size;
-#ifdef VERBOSE
-                  DEBUG(FORMAT_DEBUG_SYMBOL, function_name[j], sym.st_value);
-#endif
                 }
             }
         }
 
       if ((sym.st_info & 0x0F) == STT_OBJECT)
         {
-          for(int j = 0; j < NUM_OBJECT; j++)
+          for (int j = 0; j < NUM_OBJECT; j++)
             {
               if (strcmp(table_st_name + sym.st_name, object_name[j]) == 0)
                 {
-                  bomb->object[j].laddr = 0;
-                  bomb->object[j].paddr = 0;
+                  bomb->object[j].laddr = sym.st_value;
+
+                  for (int k = 0; k < NUM_SECTION; k++)
+                    if (sym.st_shndx == bomb->section[k].ndx)
+                      bomb->object[j].paddr = sym.st_value - bomb->section[k].offset;
+                  
                   bomb->object[j].size = sym.st_size;
-#ifdef VERBOSE
-                  DEBUG(FORMAT_DEBUG_SYMBOL, object_name[j], sym.st_value);
-#endif
                 }
             }
         }
-
-      /*
-         printf("     %s\n", table_st_name + sym.st_name);
-         printf("st_info = %d\n", sym.st_info);
-         printf("st_shndx = %d\n", sym.st_shndx);
-         printf("st_value = %p\n", (void *)sym.st_value);
-         printf("st_size = %zd\n", sym.st_size);
-         */
     }
+
+#ifdef VERBOSE
+  DEBUG("Functions:");
+  for (int i = 0; i < NUM_FUNCTION; i++)
+    DEBUG(FORMAT_DEBUG_SYMBOL, function_name[i],
+          bomb->function[i].laddr, bomb->function[i].paddr, bomb->function[i].size);
+
+  DEBUG("Objects:");
+  for (int i = 0; i < NUM_OBJECT; i++)
+    DEBUG(FORMAT_DEBUG_SYMBOL, object_name[i],
+          bomb->object[i].laddr, bomb->object[i].paddr, bomb->object[i].size);
+#endif
 
   return 0;
 }

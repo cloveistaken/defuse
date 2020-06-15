@@ -8,8 +8,8 @@
 #define FILE_TEST "dQw4w9WgXcQ"
 #define FILE_PHASE_1 "phase_1"
 
-#define FORMAT_DEBUG_SECTION    "   %-12s -> 0x%lx (Section %d)"
-#define FORMAT_DEBUG_SYMBOL     "   %-12s -> 0x%lx"
+#define FORMAT_DEBUG_SECTION    "   %-15s  ->  0x%-6lx / 0x%-4lx (Section %d)"
+#define FORMAT_DEBUG_SYMBOL     "   %-15s  ->  0x%-6lx / 0x%-4lx / %ld"
 
 #define INFO(...) do { \
     printf(GREEN("[INFO] ")); \

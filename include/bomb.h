@@ -8,13 +8,14 @@
 
 typedef struct
 {
+  int     ndx;            /* Absolute section number */
   size_t  laddr;          /* Loaded address */
   size_t  paddr;          /* Physical address */
   size_t  offset;         /* Offset between loaded and physical addresses */
 } Section;
 
 /* Symbol */
-#define NUM_FUNCTION  7
+#define NUM_FUNCTION  9
 #define MAIN          0
 #define PHASE_1       1
 #define PHASE_2       2
