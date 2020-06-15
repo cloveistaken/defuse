@@ -1,5 +1,6 @@
 #include <elf.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -12,7 +13,7 @@
 #include "../include/util.h"
 
 int
-bootstrap (void)
+bootstrap (Bomb* bomb)
 {
   char* tmpfile_test;
 
@@ -23,16 +24,40 @@ bootstrap (void)
   unlink(tmpfile_test);
   free(tmpfile_test);
 
-  bootstrap_phase_1();
+  if (bootstrap_phase_1(bomb) == -1)
+    ERROR("Fail to bootstrap phase 1");
 
+  return 0;
+}
+
+int
+clean_copy (char* filename, Bomb* bomb)
+{
+  char* dest;
+  int fd;
+
+  fd = open(filename, O_RDWR);
+  if (fd == -1)
+    return -1;
+
+  /* Need to resize because file size != mmap size, otherwise "bus error" */
+  if (ftruncate(fd, bomb->size) == -1)
+    return -1;
+
+  dest = mmap(NULL, bomb->size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (dest == MAP_FAILED)
+    return -1;
+
+  memcpy(dest, bomb->original, bomb->size);
+
+  munmap(dest, bomb->size);
+  close(fd);
   return 0;
 }
 
 int
 parse_bomb (char* addr, Bomb* bomb)
 {
-  bomb->a = 0;
-
   Elf64_Ehdr hdr;
   Elf64_Shdr shdr_shstrtab, shdr_symtab;
   int loaded_diff;
@@ -127,5 +152,6 @@ parse_bomb (char* addr, Bomb* bomb)
         }
     }
 
+  printf("%ld\n", bomb->size);
   return 0;
 }

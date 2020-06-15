@@ -2,11 +2,15 @@
 
 typedef struct
 {
-  int a;
+  char* original;
+  size_t size;
 } Bomb;
 
 int
-parse_bomb (char* addr, Bomb* bomb);
+bootstrap (Bomb* bomb);
 
 int
-bootstrap (void);
+clean_copy (char* filename, Bomb* bomb);
+
+int
+parse_bomb (char* addr, Bomb* bomb);

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "../include/phase_1.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -42,11 +43,18 @@ main (int argc, char* argv[])
   DEBUG("Address: %p / File size: %ld bytes", (void *) addr, sb.st_size);
 #endif
 
+  bomb.original = addr;
+  bomb.size = sb.st_size;
+
   if (parse_bomb(addr, &bomb) == -1)
     FATAL("Error parsing \"%s\". The binary might be incorrect or corrupted.", argv[1]);
 
-  if (bootstrap() == -1)
+  if (bootstrap(&bomb) == -1)
     FATAL("Error while doing bootstrap.");
 
+  solve_phase_1();
+
+  munmap(addr);
+  close(fd);
   return 0;
 }
