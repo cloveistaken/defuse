@@ -38,7 +38,8 @@ main (int argc, char* argv[])
     FATAL("Error loading \"%s\" into memory", argv[1]);
 
 #ifdef VERBOSE
-  DEBUG("Loaded the binary - Address: %p | File size: %ld bytes", (void *) addr, sb.st_size);
+  DEBUG("Loaded the binary into memory");
+  DEBUG("Address: %p / File size: %ld bytes", (void *) addr, sb.st_size);
 #endif
 
   if (parse_bomb(addr, &bomb) == -1)
