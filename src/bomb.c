@@ -108,7 +108,7 @@ parse_bomb (char* addr, Bomb* bomb)
   table_sh_name = addr + shdr_shstrtab.sh_offset;
 
 #ifdef VERBOSE
-  DEBUG("  %s  ->  0x%lx (Section %d)", ".shstrtab", shdr_shstrtab.sh_offset, hdr.e_shstrndx);
+  DEBUG(FORMAT_DEBUG_SECTION, ".shstrtab", shdr_shstrtab.sh_offset, hdr.e_shstrndx);
 #endif
 
   shdr_symtab.sh_type = SHT_NULL;
@@ -124,7 +124,7 @@ parse_bomb (char* addr, Bomb* bomb)
         {
           memcpy(&shdr_symtab, &shdr, sizeof(shdr));
 #ifdef VERBOSE
-          DEBUG("  %s  ->  0x%lx (Section %d)", ".symtab", shdr.sh_offset, i);
+          DEBUG(FORMAT_DEBUG_SECTION, ".symtab", shdr.sh_offset, i);
 #endif
         }
 
@@ -133,7 +133,7 @@ parse_bomb (char* addr, Bomb* bomb)
         {
           table_st_name = addr + shdr.sh_offset;
 #ifdef VERBOSE
-          DEBUG("  %s  ->  0x%lx (Section %d)", ".strtab", shdr.sh_offset, i);
+          DEBUG(FORMAT_DEBUG_SECTION, ".strtab", shdr.sh_offset, i);
 #endif
         }
 
@@ -147,7 +147,7 @@ parse_bomb (char* addr, Bomb* bomb)
                   bomb->section[j].paddr = shdr.sh_offset;
                   bomb->section[j].offset = shdr.sh_addr - shdr.sh_offset;
 #ifdef VERBOSE
-                  DEBUG("  %s  ->  0x%lx (Section %d)", section_name[j], shdr.sh_offset, i);
+                  DEBUG(FORMAT_DEBUG_SECTION, section_name[j], shdr.sh_offset, i);
 #endif
                 }
             }
@@ -183,7 +183,7 @@ parse_bomb (char* addr, Bomb* bomb)
                   bomb->function[j].paddr = 0;
                   bomb->function[j].size = sym.st_size;
 #ifdef VERBOSE
-                  DEBUG("  %s  ->  0x%lx", function_name[j], sym.st_value);
+                  DEBUG(FORMAT_DEBUG_SYMBOL, function_name[j], sym.st_value);
 #endif
                 }
             }
@@ -198,6 +198,9 @@ parse_bomb (char* addr, Bomb* bomb)
                   bomb->object[j].laddr = 0;
                   bomb->object[j].paddr = 0;
                   bomb->object[j].size = sym.st_size;
+#ifdef VERBOSE
+                  DEBUG(FORMAT_DEBUG_SYMBOL, object_name[j], sym.st_value);
+#endif
                 }
             }
         }

@@ -8,6 +8,9 @@
 #define FILE_TEST "dQw4w9WgXcQ"
 #define FILE_PHASE_1 "phase_1"
 
+#define FORMAT_DEBUG_SECTION    "   %-12s -> 0x%lx (Section %d)"
+#define FORMAT_DEBUG_SYMBOL     "   %-12s -> 0x%lx"
+
 #define INFO(...) do { \
     printf(GREEN("[INFO] ")); \
     printf(__VA_ARGS__); \
