@@ -50,6 +50,13 @@ clean_copy (char* filename, Bomb* bomb)
 
   memcpy(dest, bomb->original, bomb->size);
 
+  // Patch main
+  memcpy(dest + bomb->function[MAIN].paddr, "\x90\x90\x90\x90", 4);
+
+  // Patch initialize_bomb
+  // Patch explode_bomb
+  // Patch phase_defused
+
   munmap(dest, bomb->size);
   close(fd);
   return 0;
@@ -67,6 +74,7 @@ parse_bomb (char* addr, Bomb* bomb)
       ".text",
       ".rodata",
       ".data",
+      ".bss",
   };
 
   char* function_name[] = {
@@ -77,12 +85,14 @@ parse_bomb (char* addr, Bomb* bomb)
       "phase_4",
       "phase_5",
       "phase_6",
-      "sig_handler",
+      "phase_defused",
+      "initialize_bomb",
       "explode_bomb",
   };
 
   char* object_name[] = {
       "bomb_id",
+      "input_strings",
   };
 
   memcpy(&hdr, addr, sizeof(hdr));
@@ -123,17 +133,14 @@ parse_bomb (char* addr, Bomb* bomb)
           && strcmp(table_sh_name + shdr.sh_name, ".strtab") == 0)
         table_st_name = addr + shdr.sh_offset;
 
-      if (shdr.sh_type == SHT_PROGBITS)
+      for (int j = 0; j < NUM_SECTION; j++)
         {
-          for (int j = 0; j < NUM_SECTION; j++)
+          if (strcmp(table_sh_name + shdr.sh_name, section_name[j]) == 0)
             {
-              if (strcmp(table_sh_name + shdr.sh_name, section_name[j]) == 0)
-                {
-                  bomb->section[j].ndx = i;
-                  bomb->section[j].laddr = shdr.sh_addr;
-                  bomb->section[j].paddr = shdr.sh_offset;
-                  bomb->section[j].offset = shdr.sh_addr - shdr.sh_offset;
-                }
+              bomb->section[j].ndx = i;
+              bomb->section[j].laddr = shdr.sh_addr;
+              bomb->section[j].paddr = shdr.sh_offset;
+              bomb->section[j].offset = shdr.sh_addr - shdr.sh_offset;
             }
         }
     }
@@ -187,9 +194,16 @@ parse_bomb (char* addr, Bomb* bomb)
                 {
                   bomb->object[j].laddr = sym.st_value;
 
+                  bomb->object[j].paddr = 0;
                   for (int k = 0; k < NUM_SECTION; k++)
                     if (sym.st_shndx == bomb->section[k].ndx)
                       bomb->object[j].paddr = sym.st_value - bomb->section[k].offset;
+
+                  if (bomb->object[j].paddr == 0)
+                    {
+                      DEBUG("paddr = %lx", bomb->object[j].paddr);
+                      DEBUG("Section %d", sym.st_shndx);
+                    }
                   
                   bomb->object[j].size = sym.st_size;
                 }

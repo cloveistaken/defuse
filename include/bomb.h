@@ -1,10 +1,11 @@
 #pragma once
 
 /* Section */
-#define NUM_SECTION   3
-#define TEXT          0
-#define RODATA        1
-#define DATA          2
+#define NUM_SECTION       4
+#define TEXT              0
+#define RODATA            1
+#define DATA              2
+#define BSS               3
 
 typedef struct
 {
@@ -15,19 +16,21 @@ typedef struct
 } Section;
 
 /* Symbol */
-#define NUM_FUNCTION  9
-#define MAIN          0
-#define PHASE_1       1
-#define PHASE_2       2
-#define PHASE_3       3
-#define PHASE_4       4
-#define PHASE_5       5
-#define PHASE_6       6
-#define SIG_HANDLER   7
-#define EXPLODE_BOMB  8
+#define NUM_FUNCTION      10
+#define MAIN              0
+#define PHASE_1           1
+#define PHASE_2           2
+#define PHASE_3           3
+#define PHASE_4           4
+#define PHASE_5           5
+#define PHASE_6           6
+#define PHASE_DEFUSED     7
+#define INITIALIZE_BOMB   8
+#define EXPLODE_BOMB      9
 
-#define NUM_OBJECT    1
-#define BOMB_ID       0
+#define NUM_OBJECT        2
+#define BOMB_ID           0
+#define INPUT_STRINGS     1
 
 typedef struct
 {
