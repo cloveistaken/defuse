@@ -9,11 +9,7 @@ bootstrap_phase_1 (Bomb* bomb)
 {
   char* tmpfile;
 
-#ifdef VERBOSE
-  DEBUG("Bootstrap phase 1");
-#endif
-
-  tmpfile = create_tmpfile("phase_1");
+  tmpfile = create_tmpfile(FILE_PHASE_1);
   if (tmpfile == NULL)
     return -1;
 

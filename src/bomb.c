@@ -17,7 +17,7 @@ bootstrap (Bomb* bomb)
 {
   char* tmpfile_test;
 
-  tmpfile_test = create_tmpfile("dQw4w9WgXcQ");
+  tmpfile_test = create_tmpfile(FILE_TEST);
   if (tmpfile_test == NULL)
     ERROR("Can't create temporary file.");
 

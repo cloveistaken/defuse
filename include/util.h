@@ -5,6 +5,9 @@
 #define YELLOW(str) "\033[0;33m" str "\033[0m" " "
 #define BLUE(str) "\033[0;34m" str "\033[0m" " "
 
+#define FILE_TEST "dQw4w9WgXcQ"
+#define FILE_PHASE_1 "phase_1"
+
 #define DEBUG(...) do { \
     printf(BLUE("[DEBUG]")); \
     printf(__VA_ARGS__); \
