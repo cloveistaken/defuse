@@ -1,4 +1,9 @@
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "../include/util.h"
 
@@ -19,4 +24,38 @@ print_banner (void)
 "                                              \n";
 
   printf("%s\n", banner);
+}
+
+char*
+create_tmpfile (char* filename)
+{
+  char* tmpdir;
+  char* tmpfile;
+  int fd;
+
+  tmpdir = getenv("TMPDIR");
+  if (tmpdir == NULL)
+#ifdef VERBOSE
+    tmpdir = "tmp";
+#else
+    tmpdir = "/tmp";
+#endif
+
+  fd = open(tmpdir, O_DIRECTORY);
+  if (fd == -1)
+    return NULL;
+  close(fd);
+
+  tmpfile = malloc(100);
+  snprintf(tmpfile, 100, "%s/%s", tmpdir, filename);
+
+  /* No need to check exit status */
+  unlink(tmpfile);
+
+  fd = open(tmpfile, O_CREAT | O_WRONLY, 0700);
+  if (fd == -1)
+    return NULL;
+  close(fd);
+
+  return tmpfile;
 }

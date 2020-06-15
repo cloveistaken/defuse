@@ -1,8 +1,8 @@
 #include <elf.h>
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,6 +44,9 @@ main (int argc, char* argv[])
 
   if (parse_bomb(addr, &bomb) == -1)
     FATAL("Error parsing \"%s\". The binary might be incorrect or corrupted.", argv[1]);
+
+  if (bootstrap() == -1)
+    FATAL("Error while doing bootstrap.");
 
   return 0;
 }

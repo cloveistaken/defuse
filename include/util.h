@@ -29,3 +29,6 @@
 
 void
 print_banner (void);
+
+char*
+create_tmpfile (char* filename);

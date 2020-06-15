@@ -1,10 +1,29 @@
 #include <elf.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "../include/bomb.h"
 #include "../include/util.h"
+
+int
+bootstrap (void)
+{
+  char* tmpfile_test;
+
+  tmpfile_test = "dQw4w9WgXcQ";
+  tmpfile_test = create_tmpfile(tmpfile_test);
+  if (tmpfile_test == NULL)
+    ERROR("Can't create temporary file.");
+  unlink(tmpfile_test);
+  free(tmpfile_test);
+
+  return 0;
+}
 
 int
 parse_bomb (char* addr, Bomb* bomb)

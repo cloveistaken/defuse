@@ -7,3 +7,6 @@ typedef struct
 
 int
 parse_bomb (char* addr, Bomb* bomb);
+
+int
+bootstrap (void);
