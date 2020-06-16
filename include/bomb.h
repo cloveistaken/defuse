@@ -76,7 +76,7 @@ int
 bootstrap (Bomb* bomb);
 
 int
-clean_copy (char* filename, Bomb* bomb);
+clean_copy (char* filename, Bomb* bomb, int phase);
 
 int
 parse_bomb (char* addr, Bomb* bomb);

@@ -13,7 +13,7 @@ bootstrap_phase_1 (Bomb* bomb)
   if (tmpfile == NULL)
     return -1;
 
-  if (clean_copy(tmpfile, bomb) == -1)
+  if (clean_copy(tmpfile, bomb, 1) == -1)
     return -1;
 
   return 0;

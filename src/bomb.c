@@ -31,7 +31,7 @@ bootstrap (Bomb* bomb)
 }
 
 int
-clean_copy (char* filename, Bomb* bomb)
+clean_copy (char* filename, Bomb* bomb, int phase)
 {
   char* dest;
   int fd;
@@ -69,7 +69,9 @@ clean_copy (char* filename, Bomb* bomb)
   /* Maybe there is a better way than hardcoded index */
   memcpy(patched_main + 7, &(bomb->object[INPUT_STRINGS].laddr), 4);
   memcpy(patched_main + 21, &(bomb->object[INPUT_STRINGS].laddr), 4);
-  offset_to_phase = bomb->function[PHASE_1].laddr - (bomb->function[MAIN].laddr + 30);
+
+  /* phase should be PHASE_X (from 1 to 6) */
+  offset_to_phase = bomb->function[phase].laddr - (bomb->function[MAIN].laddr + 30);
   memcpy(patched_main + 26, &offset_to_phase, 4);
 
   memcpy(dest + bomb->function[MAIN].paddr, patched_main, size_main);
