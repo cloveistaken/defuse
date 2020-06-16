@@ -35,6 +35,9 @@ clean_copy (char* filename, Bomb* bomb)
 {
   char* dest;
   int fd;
+  char* patched_main;
+  size_t size_main;
+  int offset_to_phase;
 
   fd = open(filename, O_RDWR);
   if (fd == -1)
@@ -50,13 +53,31 @@ clean_copy (char* filename, Bomb* bomb)
 
   memcpy(dest, bomb->original, bomb->size);
 
-  // Patch main
-  memcpy(dest + bomb->function[MAIN].paddr, "\x90\x90\x90\x90", 4);
+  /* Patching main */
+  size_main = bomb->function[MAIN].size;
+  if (size_main < strlen(SHELLCODE_MAIN))
+    ERROR("\"main\" is too small for the shellcode (size = %ld).", size_main);
+  
+  patched_main = malloc(size_main);
+  if (patched_main == NULL)
+    return -1;
 
-  // Patch initialize_bomb
-  // Patch explode_bomb
-  // Patch phase_defused
+  /* Load shellcode core */
+  memset(patched_main, NOP, size_main);
+  memcpy(patched_main, SHELLCODE_MAIN, strlen(SHELLCODE_MAIN));
 
+  //char* a = (char*) &(bomb->object[INPUT_STRINGS].laddr);
+
+    /* Maybe there is a better way than hardcoded index */
+  memcpy(patched_main + 7, &(bomb->object[INPUT_STRINGS].laddr), 4);
+  memcpy(patched_main + 21, &(bomb->object[INPUT_STRINGS].laddr), 4);
+
+  offset_to_phase = bomb->function[PHASE_1].laddr - (bomb->function[MAIN].laddr + 30);
+  memcpy(patched_main + 26, &offset_to_phase, 4);
+
+  memcpy(dest + bomb->function[MAIN].paddr, patched_main, size_main);
+
+  free(patched_main);
   munmap(dest, bomb->size);
   close(fd);
   return 0;
@@ -194,16 +215,12 @@ parse_bomb (char* addr, Bomb* bomb)
                 {
                   bomb->object[j].laddr = sym.st_value;
 
-                  bomb->object[j].paddr = 0;
+                  /* Every object should fall into .rodata, .data or .bss
+                   * (Not true in general, but here it is)
+                   */
                   for (int k = 0; k < NUM_SECTION; k++)
                     if (sym.st_shndx == bomb->section[k].ndx)
                       bomb->object[j].paddr = sym.st_value - bomb->section[k].offset;
-
-                  if (bomb->object[j].paddr == 0)
-                    {
-                      DEBUG("paddr = %lx", bomb->object[j].paddr);
-                      DEBUG("Section %d", sym.st_shndx);
-                    }
                   
                   bomb->object[j].size = sym.st_size;
                 }

