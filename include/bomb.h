@@ -65,7 +65,12 @@ typedef struct
                             "\xff\xc0" \
                             "\x31\xdb" \
                             "\xcd\x80"
-#define SHELLCODE_MAIN_LEN  38
+
+#define SHELLCODE_EXPLODE   "\x31\xc0" \
+                            "\xff\xc0" \
+                            "\x31\xdb" \
+                            "\xb3\x2a" \
+                            "\xcd\x80"
 
 int
 bootstrap (Bomb* bomb);

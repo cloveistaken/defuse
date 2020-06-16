@@ -21,7 +21,6 @@ DB_FLAGS = -g -O0 -DVERBOSE
 # Start here
 .PHONY = all clean debug release remake
 
-
 all: release debug
 
 release: $(RL_BIN)

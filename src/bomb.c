@@ -38,6 +38,8 @@ clean_copy (char* filename, Bomb* bomb)
   char* patched_main;
   size_t size_main;
   int offset_to_phase;
+  char* patched_explode;
+  size_t size_explode;
 
   fd = open(filename, O_RDWR);
   if (fd == -1)
@@ -61,23 +63,32 @@ clean_copy (char* filename, Bomb* bomb)
   patched_main = malloc(size_main);
   if (patched_main == NULL)
     return -1;
-
-  /* Load shellcode core */
   memset(patched_main, NOP, size_main);
   memcpy(patched_main, SHELLCODE_MAIN, strlen(SHELLCODE_MAIN));
 
-  //char* a = (char*) &(bomb->object[INPUT_STRINGS].laddr);
-
-    /* Maybe there is a better way than hardcoded index */
+  /* Maybe there is a better way than hardcoded index */
   memcpy(patched_main + 7, &(bomb->object[INPUT_STRINGS].laddr), 4);
   memcpy(patched_main + 21, &(bomb->object[INPUT_STRINGS].laddr), 4);
-
   offset_to_phase = bomb->function[PHASE_1].laddr - (bomb->function[MAIN].laddr + 30);
   memcpy(patched_main + 26, &offset_to_phase, 4);
 
   memcpy(dest + bomb->function[MAIN].paddr, patched_main, size_main);
-
   free(patched_main);
+
+  /* Patching explode_bomb */
+  size_explode = bomb->function[EXPLODE_BOMB].size;
+  if (size_explode < strlen(SHELLCODE_EXPLODE))
+    ERROR("\"explode_bomb\" is too small for the shellcode (size = %ld).", size_explode);
+
+  patched_explode = malloc(size_explode);
+  if (patched_explode == NULL)
+    return -1;
+  memset(patched_explode, NOP, size_explode);
+  memcpy(patched_explode, SHELLCODE_EXPLODE, strlen(SHELLCODE_EXPLODE));
+
+  memcpy(dest + bomb->function[EXPLODE_BOMB].paddr, patched_explode, size_explode);
+  free(patched_explode);
+
   munmap(dest, bomb->size);
   close(fd);
   return 0;
