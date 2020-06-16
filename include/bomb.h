@@ -73,9 +73,6 @@ typedef struct
                             "\xcd\x80"
 
 int
-bootstrap (Bomb* bomb);
-
-int
 clean_copy (char* filename, Bomb* bomb, int phase);
 
 int

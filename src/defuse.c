@@ -20,6 +20,7 @@ main (int argc, char* argv[])
   int fd;
   struct stat sb;
   Bomb bomb;
+  char* tmpfile_test;
 
   print_banner();
   if (argc != 2)
@@ -49,8 +50,17 @@ main (int argc, char* argv[])
   if (parse_bomb(addr, &bomb) == -1)
     FATAL("Error parsing \"%s\". The binary might be incorrect or corrupted.", argv[1]);
 
-  if (bootstrap(&bomb) == -1)
-    FATAL("Error while doing bootstrap.");
+  /* Test creating temporary file */
+  tmpfile_test = create_tmpfile(FILE_TEST);
+  if (tmpfile_test == NULL)
+    FATAL("Can't create test temporary file.");
+
+  unlink(tmpfile_test);
+  free(tmpfile_test);
+
+  /* Fire !!! */
+  if (solve_phase_1(&bomb) == -1)
+    FATAL("Error solving phase 1.");
 
   munmap(addr, sb.st_size);
   close(fd);

@@ -14,27 +14,6 @@
 #include "../include/util.h"
 
 int
-bootstrap (Bomb* bomb)
-{
-  char* tmpfile_test;
-
-  tmpfile_test = create_tmpfile(FILE_TEST);
-  if (tmpfile_test == NULL)
-    ERROR("Can't create temporary file.");
-
-  unlink(tmpfile_test);
-  free(tmpfile_test);
-
-  if (bootstrap_phase_1(bomb) == -1)
-    ERROR("Fail to bootstrap phase 1");
-
-  if (bootstrap_phase_2(bomb) == -1)
-    ERROR("Fail to bootstrap phase 2");
-
-  return 0;
-}
-
-int
 clean_copy (char* filename, Bomb* bomb, int phase)
 {
   char* dest;

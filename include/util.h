@@ -6,7 +6,6 @@
 #define BLUE(str) "\033[0;34m" str "\033[0m" " "
 
 #define FILE_TEST "dQw4w9WgXcQ"
-#define FILE_PHASE_1 "phase_1"
 
 #define FORMAT_DEBUG_SECTION    "   %-15s  ->  0x%-6lx / 0x%-4lx (Section %d)"
 #define FORMAT_DEBUG_SYMBOL     "   %-15s  ->  0x%-6lx / 0x%-4lx / %ld"
