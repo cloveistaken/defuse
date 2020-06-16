@@ -36,8 +36,10 @@ main (int argc, char* argv[])
   if (fstat(fd, &sb) == -1)
     FATAL("Error reading stat of \"%s\"", argv[1]);
 
+  INFO("Loading \"%s\"", argv[1]);
+    
 #ifdef VERBOSE
-  DEBUG("File size: %ld bytes", sb.st_size);
+  DEBUG("   File size: %ld bytes", sb.st_size);
 #endif
 
   addr = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
@@ -56,7 +58,6 @@ main (int argc, char* argv[])
   for (int i = 0; i <= NUM_PHASE; i++)
     bomb.answer[i] = NULL;
 
-  INFO("Parsing bomb...");
   if (parse_bomb(addr, &bomb) == -1)
     FATAL("Error parsing \"%s\". The binary might be incorrect or corrupted.", argv[1]);
 

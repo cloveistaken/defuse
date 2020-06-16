@@ -15,6 +15,8 @@
 #define INFO(...) do { \
     printf(GREEN("[INFO] ")); \
     printf(__VA_ARGS__); \
+    for (int l = 0; l < 3; l++) \
+      { printf("."); fflush(stdout); usleep(100000); } \
     printf("\n"); \
 } while (0)
 

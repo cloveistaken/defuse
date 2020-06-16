@@ -13,7 +13,7 @@ solve_phase_1 (Bomb* bomb)
   char* file;
   char* answer;
 
-  INFO("Solving phase 1...");
+  INFO("Solving phase 1");
   /* Create safe file for brute-forcing */
   file = create_tmpfile(FILE_PHASE1);
   if (file == NULL
@@ -24,7 +24,7 @@ solve_phase_1 (Bomb* bomb)
   answer[ANSWER_MAX_LEN] = '\0';
 
   /* Generating possible answers here */
-  char* trial = "Wow! Brazil is big.";
+  char* trial = "Wow! Brazil is big.!";
   strncpy(answer, trial, ANSWER_MAX_LEN);
   
   if (try_answer(file, answer) == 0)
@@ -34,7 +34,7 @@ solve_phase_1 (Bomb* bomb)
     }
 
   if (bomb->answer[PHASE_1] == NULL)
-    return -1;
+    ERROR("Can't find answer for phase %d", PHASE_1);
 
 #ifndef VERBOSE
   unlink(file);

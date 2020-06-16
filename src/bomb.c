@@ -129,9 +129,7 @@ parse_bomb (char* addr, Bomb* bomb)
       || hdr.e_machine != EM_X86_64)
     ERROR("Only 64-bit ELF (x86_64) is supported.");
 
-#ifdef VERBOSE
-  INFO("Parsing ELF sections..."); 
-#endif
+  INFO("Parsing ELF sections"); 
 
   if (hdr.e_shstrndx == SHN_UNDEF)
     ERROR(".shstrtab not found. File might to be stripped.");
@@ -182,9 +180,7 @@ parse_bomb (char* addr, Bomb* bomb)
   
   // TODO: Add a check here
 
-#ifdef VERBOSE
-  INFO("Parsing ELF symbols...");
-#endif
+  INFO("Parsing ELF symbols");
 
   for (unsigned int i = 0; i < shdr_symtab.sh_size / shdr_symtab.sh_entsize; i++)
     {
