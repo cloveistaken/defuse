@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include "../include/phase_1.h"
+#include "../include/phase_2.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -34,14 +35,13 @@ main (int argc, char* argv[])
   if (fstat(fd, &sb) == -1)
     FATAL("Error reading stat of \"%s\"", argv[1]);
 
+#ifdef VERBOSE
+  DEBUG("File size: %ld bytes", sb.st_size);
+#endif
+
   addr = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
   if (addr == MAP_FAILED)
     FATAL("Error loading \"%s\" into memory", argv[1]);
-
-#ifdef VERBOSE
-  DEBUG("Loaded the binary into memory");
-  DEBUG("Address: %p / File size: %ld bytes", (void *) addr, sb.st_size);
-#endif
 
   bomb.original = addr;
   bomb.size = sb.st_size;

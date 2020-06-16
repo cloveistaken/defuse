@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include "../include/phase_1.h"
+#include "../include/phase_2.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -26,6 +27,9 @@ bootstrap (Bomb* bomb)
 
   if (bootstrap_phase_1(bomb) == -1)
     ERROR("Fail to bootstrap phase 1");
+
+  if (bootstrap_phase_2(bomb) == -1)
+    ERROR("Fail to bootstrap phase 2");
 
   return 0;
 }
@@ -63,19 +67,22 @@ clean_copy (char* filename, Bomb* bomb, int phase)
   patched_main = malloc(size_main);
   if (patched_main == NULL)
     return -1;
+
   memset(patched_main, NOP, size_main);
   memcpy(patched_main, SHELLCODE_MAIN, strlen(SHELLCODE_MAIN));
 
-  /* Maybe there is a better way than hardcoded index */
+    /* Maybe there is a better way than hardcoded index */
   memcpy(patched_main + 7, &(bomb->object[INPUT_STRINGS].laddr), 4);
   memcpy(patched_main + 21, &(bomb->object[INPUT_STRINGS].laddr), 4);
 
-  /* phase should be PHASE_X (from 1 to 6) */
+    /* phase should be PHASE_X (from 1 to 6) */
   offset_to_phase = bomb->function[phase].laddr - (bomb->function[MAIN].laddr + 30);
   memcpy(patched_main + 26, &offset_to_phase, 4);
 
   memcpy(dest + bomb->function[MAIN].paddr, patched_main, size_main);
   free(patched_main);
+  /* Finish */
+
 
   /* Patching explode_bomb */
   size_explode = bomb->function[EXPLODE_BOMB].size;
@@ -85,11 +92,13 @@ clean_copy (char* filename, Bomb* bomb, int phase)
   patched_explode = malloc(size_explode);
   if (patched_explode == NULL)
     return -1;
+
   memset(patched_explode, NOP, size_explode);
   memcpy(patched_explode, SHELLCODE_EXPLODE, strlen(SHELLCODE_EXPLODE));
 
   memcpy(dest + bomb->function[EXPLODE_BOMB].paddr, patched_explode, size_explode);
   free(patched_explode);
+  /* Finish */
 
   munmap(dest, bomb->size);
   close(fd);
