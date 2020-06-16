@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,4 +61,44 @@ create_tmpfile (char* filename)
   close(fd);
 
   return tmpfile;
+}
+
+int
+try_answer (char* filename, char* answer)
+{
+  int fd[2];
+  pid_t pid;
+
+  /* Create an anonymous pipe:
+     Parent -> fd[1] -> (fd[0] == STDIN) -> child */
+  pipe(fd);
+
+  pid = fork();   
+  if (pid == -1)
+    ERROR("Problem while forking.");
+
+  if (pid == 0)
+    {
+      /* Child */
+      char* argv[] = { filename, NULL };
+
+      close(fd[1]); 
+      dup2(fd[0], 0);
+      execve(filename, argv, NULL);
+    }
+
+  if (pid > 0)
+    {
+      /* Parent */
+      int status;
+      close(fd[0]);
+
+      /* Need to write the last '\0' byte */
+      write(fd[1], answer, strlen(answer) + 1);
+
+      waitpid(pid, &status, 0);
+      return WEXITSTATUS(status);
+    }
+
+  return 0;
 }

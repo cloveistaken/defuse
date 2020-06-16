@@ -1,5 +1,7 @@
 #pragma once
 
+#define NUM_PHASE         6
+
 /* Section */
 #define NUM_SECTION       4
 #define TEXT              0
@@ -47,6 +49,7 @@ typedef struct
   Section section[NUM_SECTION];   /* List of important sections */
   Symbol  function[NUM_FUNCTION]; /* List of important functions */
   Symbol  object[NUM_OBJECT];     /* List of important objects */
+  char*   answer[NUM_PHASE + 1];  /* List of answers (answer[0] is always NULL */
 } Bomb;
 
 #define NOP                 '\x90'

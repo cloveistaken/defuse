@@ -6,10 +6,11 @@
 #define BLUE(str)       "\033[0;34m" str "\033[0m" " "
 
 #define FILE_TEST       "dQw4w9WgXcQ"
-#define ANSWER_MAX_LEN  80
+#define ANSWER_MAX_LEN  79
 
 #define FORMAT_DEBUG_SECTION    "   %-15s  ->  0x%-6lx / 0x%-4lx (Section %d)"
 #define FORMAT_DEBUG_SYMBOL     "   %-15s  ->  0x%-6lx / 0x%-4lx / %ld"
+#define FORMAT_ANSWER_FOUND     "   Phase %d: \"%s\""
 
 #define INFO(...) do { \
     printf(GREEN("[INFO] ")); \

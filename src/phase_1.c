@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "../include/phase_1.h"
@@ -11,42 +10,36 @@
 int
 solve_phase_1 (Bomb* bomb)
 {
-  /* Create safe file for brute-forcing */
   char* file;
+  char* answer;
 
+  INFO("Solving phase 1...");
+  /* Create safe file for brute-forcing */
   file = create_tmpfile(FILE_PHASE1);
-  if (file == NULL)
-    ERROR("Can't create %s.", FILE_PHASE1);
+  if (file == NULL
+      || clean_copy(file, bomb, PHASE_1))
+    ERROR("Error while creating patched file %s.", FILE_PHASE1);
 
-  return bomb->size;
-}
+  answer = malloc(ANSWER_MAX_LEN + 1);
+  answer[ANSWER_MAX_LEN] = '\0';
 
-/*
-  //char* file = "tmp/phase_1";
-  char* args[] = { file, NULL };
-  char* answer = "Wow! Brazil is big.";
-
-  int fd[2];
-  pipe(fd);
-
-  pid_t pid = fork();
-
-  if (pid == 0)
+  /* Generating possible answers here */
+  char* trial = "Wow! Brazil is big.";
+  strncpy(answer, trial, ANSWER_MAX_LEN);
+  
+  if (try_answer(file, answer) == 0)
     {
-      // Child
-      close(fd[1]);
-      dup2(fd[0], 0);
-      execve(file, args, NULL);
+      INFO(FORMAT_ANSWER_FOUND, PHASE_1, answer);
+      bomb->answer[PHASE_1] = answer;
     }
-  else
-    {
-      // Parent
-      close(fd[0]);
-      write(fd[1], answer, strlen(answer) + 1);
 
-      int status;
-      wait(&status); 
-      printf("%d\n", WEXITSTATUS(status));
-    }
+  if (bomb->answer[PHASE_1] == NULL)
+    return -1;
+
+#ifndef VERBOSE
+  unlink(file);
+#endif
+  free(file);
+
   return 0;
-  */
+}

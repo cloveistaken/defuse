@@ -62,7 +62,9 @@ main (int argc, char* argv[])
   if (solve_phase_1(&bomb) == -1)
     FATAL("Error solving phase 1.");
 
+  /* TODO: Free all bomb->answer[] */
   munmap(addr, sb.st_size);
   close(fd);
+
   return 0;
 }
