@@ -1,11 +1,12 @@
 #pragma once
 
-#define RED(str) "\033[0;31m" str "\033[0m" " "
-#define GREEN(str) "\033[0;32m" str "\033[0m" " "
-#define YELLOW(str) "\033[0;33m" str "\033[0m" " "
-#define BLUE(str) "\033[0;34m" str "\033[0m" " "
+#define RED(str)        "\033[0;31m" str "\033[0m" " "
+#define GREEN(str)      "\033[0;32m" str "\033[0m" " "
+#define YELLOW(str)     "\033[0;33m" str "\033[0m" " "
+#define BLUE(str)       "\033[0;34m" str "\033[0m" " "
 
-#define FILE_TEST "dQw4w9WgXcQ"
+#define FILE_TEST       "dQw4w9WgXcQ"
+#define ANSWER_MAX_LEN  80
 
 #define FORMAT_DEBUG_SECTION    "   %-15s  ->  0x%-6lx / 0x%-4lx (Section %d)"
 #define FORMAT_DEBUG_SYMBOL     "   %-15s  ->  0x%-6lx / 0x%-4lx / %ld"
@@ -41,3 +42,6 @@ print_banner (void);
 
 char*
 create_tmpfile (char* filename);
+
+int
+try_answer (char* filename, char* answer);
