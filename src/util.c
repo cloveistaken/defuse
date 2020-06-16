@@ -96,6 +96,7 @@ try_answer (char* filename, char* answer)
       /* Need to write the last '\0' byte */
       write(fd[1], answer, strlen(answer) + 1);
 
+      /* Not sure if this would hang or not ? */
       waitpid(pid, &status, 0);
       return WEXITSTATUS(status);
     }

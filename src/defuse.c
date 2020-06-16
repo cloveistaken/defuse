@@ -44,9 +44,19 @@ main (int argc, char* argv[])
   if (addr == MAP_FAILED)
     FATAL("Error loading \"%s\" into memory", argv[1]);
 
+  /* Initialize some default values for bomb */
   bomb.original = addr;
   bomb.size = sb.st_size;
+  for (int i = 0; i < NUM_SECTION; i++)
+    bomb.section[i].ndx = -1;
+  for (int i = 0; i < NUM_FUNCTION; i++)
+    bomb.function[i].laddr = 0;
+  for (int i = 0; i < NUM_OBJECT; i++)
+    bomb.object[i].laddr = 0;
+  for (int i = 0; i <= NUM_PHASE; i++)
+    bomb.answer[i] = NULL;
 
+  INFO("Parsing bomb...");
   if (parse_bomb(addr, &bomb) == -1)
     FATAL("Error parsing \"%s\". The binary might be incorrect or corrupted.", argv[1]);
 
@@ -62,7 +72,9 @@ main (int argc, char* argv[])
   if (solve_phase_1(&bomb) == -1)
     FATAL("Error solving phase 1.");
 
-  /* TODO: Free all bomb->answer[] */
+  /* Cleaning up stuff */
+  for (int i = 0; i <= NUM_PHASE; i++)
+    free(bomb.answer[i]);
   munmap(addr, sb.st_size);
   close(fd);
 
