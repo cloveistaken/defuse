@@ -11,6 +11,9 @@
 #include "../include/phase_1.h"
 #include "../include/phase_2.h"
 #include "../include/phase_3.h"
+#include "../include/phase_4.h"
+#include "../include/phase_5.h"
+#include "../include/phase_6.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -74,6 +77,9 @@ main (int argc, char* argv[])
   solve_phase_1(&bomb);
   solve_phase_2(&bomb);
   solve_phase_3(&bomb);
+  solve_phase_4(&bomb);
+  solve_phase_5(&bomb);
+  solve_phase_6(&bomb);
 
   /* Cleaning up stuff */
   for (int i = 0; i <= NUM_PHASE; i++)
