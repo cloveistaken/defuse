@@ -98,6 +98,8 @@ try_answer (char* filename, char* answer)
 
       /* Not sure if this would hang or not ? */
       waitpid(pid, &status, 0);
+
+      close(fd[1]);
       return WEXITSTATUS(status);
     }
 
