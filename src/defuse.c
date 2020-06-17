@@ -10,6 +10,7 @@
 
 #include "../include/phase_1.h"
 #include "../include/phase_2.h"
+#include "../include/phase_3.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -72,6 +73,7 @@ main (int argc, char* argv[])
   /* Fire !!! */
   solve_phase_1(&bomb);
   solve_phase_2(&bomb);
+  solve_phase_3(&bomb);
 
   /* Cleaning up stuff */
   for (int i = 0; i <= NUM_PHASE; i++)

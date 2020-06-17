@@ -3,22 +3,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../include/phase_2.h"
+#include "../include/phase_3.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
 int
-solve_phase_2 (Bomb* bomb)
+solve_phase_3 (Bomb* bomb)
 {
   char* file;
   char* answer;
 
-  INFO("Solving phase 2");
+  INFO("Solving phase 3");
   /* Create safe file for brute-forcing */
-  file = create_tmpfile(FILE_PHASE2);
+  file = create_tmpfile(FILE_PHASE3);
   if (file == NULL
-      || clean_copy(file, bomb, PHASE_2))
-    ERROR("Error while creating patched file %s.", FILE_PHASE2);
+      || clean_copy(file, bomb, PHASE_3))
+    ERROR("Error while creating patched file %s.", FILE_PHASE3);
 
   answer = malloc(ANSWER_MAX_LEN + 1);
   answer[ANSWER_MAX_LEN] = '\0';
@@ -33,12 +33,12 @@ solve_phase_2 (Bomb* bomb)
       if (try_answer(file, answer) == 0)
         {
           FOUND(answer);
-          bomb->answer[PHASE_2] = answer;
+          bomb->answer[PHASE_3] = answer;
         }
     }
 
-  if (bomb->answer[PHASE_2] == NULL)
-    ERROR("Can't find answer for phase %d.", PHASE_2);
+  if (bomb->answer[PHASE_3] == NULL)
+    ERROR("Can't find answer for phase %d.", PHASE_3);
 
 #ifndef VERBOSE
   unlink(file);

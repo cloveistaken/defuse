@@ -8,8 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../include/phase_1.h"
-#include "../include/phase_2.h"
 #include "../include/bomb.h"
 #include "../include/util.h"
 
@@ -51,12 +49,12 @@ clean_copy (char* filename, Bomb* bomb, int phase)
   memcpy(patched_main, SHELLCODE_MAIN, strlen(SHELLCODE_MAIN));
 
     /* Maybe there is a better way than hardcoded index */
-  memcpy(patched_main + 7, &(bomb->object[INPUT_STRINGS].laddr), 4);
-  memcpy(patched_main + 21, &(bomb->object[INPUT_STRINGS].laddr), 4);
+  memcpy(patched_main + 8, &(bomb->object[INPUT_STRINGS].laddr), 4);
+  memcpy(patched_main + 22, &(bomb->object[INPUT_STRINGS].laddr), 4);
 
     /* phase should be PHASE_X (from 1 to 6) */
-  offset_to_phase = bomb->function[phase].laddr - (bomb->function[MAIN].laddr + 30);
-  memcpy(patched_main + 26, &offset_to_phase, 4);
+  offset_to_phase = bomb->function[phase].laddr - (bomb->function[MAIN].laddr + 34);
+  memcpy(patched_main + 30, &offset_to_phase, 4);
 
   memcpy(dest + bomb->function[MAIN].paddr, patched_main, size_main);
   free(patched_main);
