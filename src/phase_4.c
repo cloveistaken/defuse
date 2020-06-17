@@ -33,11 +33,11 @@ solve_phase_4 (Bomb* bomb)
           {
             FOUND(answer);
             bomb->answer[PHASE_4] = answer;
-            goto done_brute_4;
+            goto done_phase_4;
           }
       }
 
-done_brute_4:
+done_phase_4:
   if (bomb->answer[PHASE_4] == NULL)
     ERROR("Can't find answer for phase %d.", PHASE_4);
 

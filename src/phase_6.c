@@ -58,7 +58,7 @@ solve_phase_6 (Bomb* bomb)
                           {
                             FOUND(answer);
                             bomb->answer[PHASE_6] = answer;
-                            goto done_brute_6;
+                            goto done_phase_6;
                           }
                       }
                   }
@@ -66,16 +66,7 @@ solve_phase_6 (Bomb* bomb)
           }
       }
 
-  /*
-  int i[6];
-  for (int i[0] = 1; i[0] <= 6; i[0]++)
-    for (int i[1] = 1; i[1] <= 6; i[1]++)
-      for (int i[2] = 1; i[2] <= 6; i[2]++)
-        for (int i[3] = 1; i[3] <= 6; i[3]++)
-          for (int i[4] = 1; i[4] <= 6; i[4]++)
-            for (int i[5] = 1; i[5] <= 6; i[5]++)
-            */
-done_brute_6:
+done_phase_6:
   if (bomb->answer[PHASE_6] == NULL)
     ERROR("Can't find answer for phase %d.", PHASE_6);
 
