@@ -24,19 +24,37 @@ solve_phase_3 (Bomb* bomb)
   answer[ANSWER_MAX_LEN] = '\0';
 
   /* Generating possible answers here */
-  char* trials[] = { "0 1 1 2 3 5", "0 1 3 6 10 15", "1 2 4 8 16 32"};
-  for (int i = 0; i < 3; i++)
-    {
-      char* trial = trials[i];
-      strncpy(answer, trial, ANSWER_MAX_LEN);
 
-      if (try_answer(file, answer) == 0)
+  /* Case 1: %d %d */
+  for (int i = 0; i <= 7; i++)
+    for (int j = 0; j <= 200; j++) /* 200 is not a good bound, at least 1000 is better */
+      {
+        snprintf(answer, ANSWER_MAX_LEN + 1, "%d %d", i, j);
+
+        if (try_answer(file, answer) == 0)
+          {
+            FOUND(answer);
+            bomb->answer[PHASE_3] = answer;
+            goto done_phase_3;
+          }
+      }
+
+  /* Case 2: %d %c %d */
+  for (int i = 0; i <= 7; i++)
+    for (int j = 0; j <= 200; j++) /* 200 is not a good bound, at least 1000 is better */
+      for (char c = 'a'; c <= 'z'; c++)
         {
-          FOUND(answer);
-          bomb->answer[PHASE_3] = answer;
-        }
-    }
+          snprintf(answer, ANSWER_MAX_LEN + 1, "%d %c %d", i, c, j);
 
+          if (try_answer(file, answer) == 0)
+            {
+              FOUND(answer);
+              bomb->answer[PHASE_3] = answer;
+              goto done_phase_3;
+            }
+        }
+
+done_phase_3:
   if (bomb->answer[PHASE_3] == NULL)
     ERROR("Can't find answer for phase %d.", PHASE_3);
 
