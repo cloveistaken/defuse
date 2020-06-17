@@ -31,10 +31,10 @@ main (int argc, char* argv[])
   
   fd = open(argv[1], O_RDONLY);
   if (fd == -1)
-    FATAL("Error opening file \"%s\"", argv[1]);
+    FATAL("Error opening file \"%s\".", argv[1]);
 
   if (fstat(fd, &sb) == -1)
-    FATAL("Error reading stat of \"%s\"", argv[1]);
+    FATAL("Error reading stat of \"%s\".", argv[1]);
 
   INFO("Loading \"%s\"", argv[1]);
     
@@ -44,7 +44,7 @@ main (int argc, char* argv[])
 
   addr = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
   if (addr == MAP_FAILED)
-    FATAL("Error loading \"%s\" into memory", argv[1]);
+    FATAL("Error loading \"%s\" into memory.", argv[1]);
 
   /* Initialize some default values for bomb */
   bomb.original = addr;
@@ -70,8 +70,8 @@ main (int argc, char* argv[])
   free(tmpfile_test);
 
   /* Fire !!! */
-  if (solve_phase_1(&bomb) == -1)
-    FATAL("Error solving phase 1.");
+  solve_phase_1(&bomb);
+  solve_phase_2(&bomb);
 
   /* Cleaning up stuff */
   for (int i = 0; i <= NUM_PHASE; i++)

@@ -12,6 +12,10 @@
 #define FORMAT_DEBUG_SYMBOL     "   %-15s  ->  0x%-6lx / 0x%-4lx / %ld"
 #define FORMAT_ANSWER_FOUND     "   Phase %d: \"%s\""
 
+#define FOUND(answer) do { \
+    printf("        => %s\n", answer); \
+} while (0)
+
 #define INFO(...) do { \
     printf(GREEN("[INFO] ")); \
     printf(__VA_ARGS__); \
