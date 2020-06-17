@@ -24,15 +24,39 @@ solve_phase_1 (Bomb* bomb)
   answer[ANSWER_MAX_LEN] = '\0';
 
   /* Generating possible answers here */
-  char* trial = "Wow! Brazil is big.";
-  strncpy(answer, trial, ANSWER_MAX_LEN);
+  size_t ptr;
+  size_t begin = bomb->function[PHASE_1].paddr;
+  size_t size = bomb->function[PHASE_1].size;
+
+  for (ptr = begin; ptr < begin + size; ptr++)
+    {
+      if (*(unsigned char*) (bomb->original + ptr) == 0xbe)
+        /* mov ... %esi */
+        {
+          ptr += 1;
+          /* ptr now should point to the string
+             that is passed to strings_not_equal */
+          break;
+        }
+        
+    }
+
+  /* I might want to add a check (ptr == begin + size)
+     However now it's not needed,
+     which means no edge cases
+  */
+
+  ptr = *(unsigned int*) (bomb->original + ptr) - bomb->section[RODATA].offset;
+  strncpy(answer, bomb->original + ptr, ANSWER_MAX_LEN);
   
   if (try_answer(file, answer) == 0)
     {
       FOUND(answer);
       bomb->answer[PHASE_1] = answer;
+      goto done_phase_1;
     }
 
+done_phase_1:
   if (bomb->answer[PHASE_1] == NULL)
     ERROR("Can't find answer for phase %d.", PHASE_1);
 
