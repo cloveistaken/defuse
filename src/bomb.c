@@ -106,7 +106,6 @@ parse_bomb (char* addr, Bomb* bomb)
       "phase_5",
       "phase_6",
       "phase_defused",
-      "initialize_bomb",
       "explode_bomb",
   };
 

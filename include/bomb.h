@@ -18,7 +18,7 @@ typedef struct
 } Section;
 
 /* Symbol */
-#define NUM_FUNCTION      10
+#define NUM_FUNCTION      9
 #define MAIN              0
 #define PHASE_1           1
 #define PHASE_2           2
@@ -27,8 +27,7 @@ typedef struct
 #define PHASE_5           5
 #define PHASE_6           6
 #define PHASE_DEFUSED     7
-#define INITIALIZE_BOMB   8
-#define EXPLODE_BOMB      9
+#define EXPLODE_BOMB      8
 
 #define NUM_OBJECT        2
 #define BOMB_ID           0
