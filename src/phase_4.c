@@ -28,6 +28,7 @@ solve_phase_4 (Bomb* bomb)
     for (int j = 0; j <= 20; j++)
       {
         snprintf(answer, ANSWER_MAX_LEN + 1, "%d %d", i, j);
+
         if (try_answer(file, answer) == 0)
           {
             FOUND(answer);
@@ -36,7 +37,7 @@ solve_phase_4 (Bomb* bomb)
           }
       }
 
-  done_brute_4:
+done_brute_4:
   if (bomb->answer[PHASE_4] == NULL)
     ERROR("Can't find answer for phase %d.", PHASE_4);
 
