@@ -71,7 +71,8 @@ try_answer (char* filename, char* answer)
 
   /* Create an anonymous pipe:
      Parent -> fd[1] -> (fd[0] == STDIN) -> child */
-  pipe(fd);
+  if (pipe(fd) == -1)
+    ERROR("Problem while creating anonymous pipe.");
 
   pid = fork();   
   if (pid == -1)

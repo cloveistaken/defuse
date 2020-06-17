@@ -24,15 +24,19 @@ solve_phase_4 (Bomb* bomb)
   answer[ANSWER_MAX_LEN] = '\0';
 
   /* Generating possible answers here */
-  char* trial = "Wow! Brazil is big.";
-  strncpy(answer, trial, ANSWER_MAX_LEN);
-  
-  if (try_answer(file, answer) == 0)
-    {
-      FOUND(answer);
-      bomb->answer[PHASE_4] = answer;
-    }
+  for (int i = 0; i < 200; i++)
+    for (int j = 0; j <= 20; j++)
+      {
+        snprintf(answer, ANSWER_MAX_LEN + 1, "%d %d", i, j);
+        if (try_answer(file, answer) == 0)
+          {
+            FOUND(answer);
+            bomb->answer[PHASE_4] = answer;
+            goto done_brute_4;
+          }
+      }
 
+  done_brute_4:
   if (bomb->answer[PHASE_4] == NULL)
     ERROR("Can't find answer for phase %d.", PHASE_4);
 
