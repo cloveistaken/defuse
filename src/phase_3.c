@@ -25,7 +25,32 @@ solve_phase_3 (Bomb* bomb)
 
   /* Generating possible answers here */
 
-  /* Case 1: %d %d */
+  /* Case 1: %d %d - Find mov eax instruction */
+  size_t ptr;
+  size_t begin = bomb->function[PHASE_3].paddr;
+  size_t size = bomb->function[PHASE_3].size;
+
+  for (ptr = begin; ptr < begin + size; ptr++)
+    {
+      if (*(unsigned char*) (bomb->original + ptr) == 0xb8)
+        /* mov eax <- ... => Very compiler-dependent */
+        {
+          int guess = *(int*) (bomb->original + ptr + 1);
+          for (int i = 0; i <= 7; i++)
+            {
+              snprintf(answer, ANSWER_MAX_LEN + 1, "%d %d", i, guess);
+
+              if (try_answer(file, answer) == 0)
+                {
+                  FOUND(answer);
+                  bomb->answer[PHASE_3] = answer;
+                  goto done_phase_3;
+                }
+            }
+        }
+    }
+
+  /* Case 1: %d %d - Raw brute-force (Slow) */
   for (int i = 0; i <= 7; i++)
     for (int j = 0; j <= 200; j++) /* 200 is not a good bound, at least 1000 is better */
       {
@@ -39,10 +64,7 @@ solve_phase_3 (Bomb* bomb)
           }
       }
 
-  /* TODO: Stupid brute-force: Raise the bar 200 -> 1000
-           Better brute-force: Locate 0xb8 (mov eax) */
-
-  /* Case 2: %d %c %d */
+  /* Case 2: %d %c %d - Raw brute-force (Slow) */
   for (int i = 0; i <= 7; i++)
     for (int j = 0; j <= 200; j++) /* 200 is not a good bound, at least 1000 is better */
       for (char c = 'a'; c <= 'z'; c++)
