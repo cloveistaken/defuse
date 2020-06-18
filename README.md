@@ -49,6 +49,7 @@ What can be more fitting ?
 
 To put it simply, I study for patterns in a lot of bombs beforehand, and now I just write a program that brute-force the solutions.
 This is not a magic bullet, a fancy decompiler or anything, sadly.
+For a bit more technical description, I have written a small blog post [here](https://blog.cloveistaken.com/bomb-lab-solver-version-0-99/).
 
 #### It doesn't work with my binary bomb.
 
