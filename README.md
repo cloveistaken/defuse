@@ -31,6 +31,7 @@ bin/defuse <bomb>
 ```
 
 Very simple.
+The solver works for both online bomb and offline bomb.
 If you want to see some debug messages, run `bin/defuse-debug` instead.
 
 _Note_: The binary bomb has to be 64-bit ELF. The solver does not modify the main binary directly in anyway.
