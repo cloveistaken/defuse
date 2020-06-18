@@ -20,7 +20,7 @@ DB_FLAGS = -g -O0 -DVERBOSE
 
 # Start here
 .PHONY = all clean debug release remake
-.DEFAULT_GOAL = release
+.DEFAULT_GOAL = all
 
 all: release debug
 
@@ -47,4 +47,4 @@ build/%-debug.o: src/%.c $(HEADERS)
 remake: clean all
 
 clean:
-	rm -f bin/* build/* tmp/*
+	rm -f bin/* build/* tmp/* answer.txt
