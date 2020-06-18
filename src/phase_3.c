@@ -39,6 +39,9 @@ solve_phase_3 (Bomb* bomb)
           }
       }
 
+  /* TODO: Stupid brute-force: Raise the bar 200 -> 1000
+           Better brute-force: Locate 0xb8 (mov eax) */
+
   /* Case 2: %d %c %d */
   for (int i = 0; i <= 7; i++)
     for (int j = 0; j <= 200; j++) /* 200 is not a good bound, at least 1000 is better */

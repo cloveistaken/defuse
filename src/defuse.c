@@ -81,8 +81,27 @@ main (int argc, char* argv[])
   solve_phase_5(&bomb);
   solve_phase_6(&bomb);
 
+#ifndef VERBOSE
+  char* output = "answer.txt";
+  INFO("Writing to \"%s\"", output);
+
+  int output_fd = open(output, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+  if (output_fd == -1)
+    FATAL("Error writing answer to \"%s\"", output);
+
+  for (int i = 1; i <= NUM_PHASE; i++)
+    {
+      if (bomb.answer[i] != NULL)
+        write(output_fd, bomb.answer[i], strlen(bomb.answer[i]));
+      else
+        write(output_fd, "<Answer not found>", 19);
+      write(output_fd, "\n", 1);
+    }
+  close(output_fd);
+#endif
+
   /* Cleaning up stuff */
-  for (int i = 0; i <= NUM_PHASE; i++)
+  for (int i = 1; i <= NUM_PHASE; i++)
     free(bomb.answer[i]);
   munmap(addr, sb.st_size);
   close(fd);

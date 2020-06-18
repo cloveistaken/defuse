@@ -20,10 +20,12 @@ DB_FLAGS = -g -O0 -DVERBOSE
 
 # Start here
 .PHONY = all clean debug release remake
+.DEFAULT_GOAL = release
 
 all: release debug
 
 release: $(RL_BIN)
+	strip -S --strip-unneeded $(RL_BIN)
 	cp $(RL_BIN) $(TARGET)
 
 debug: $(DB_BIN)

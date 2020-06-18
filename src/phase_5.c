@@ -39,13 +39,13 @@ solve_phase_5 (Bomb* bomb)
     }
 
   /* Case 2: string(6)
-     Quite heavy to brute force - Worst case ~ 16^6 (or 26^6)
-
-     Better way but novelty:
-     Modify strings_not_equal (static / dynamic with LD_PRELOAD constructor)
-     to emit the arguments. Then input the whole alphabet to get decryption table.
+     Very slow to brute force (16^6)
+      => Will not be included in version 0.99
+    
+     Future note: Might need to separated into 2 cases (str->str and str->int)
      */
 
+  /*
   for (char c1 = 'a'; c1 <= 'q'; c1++)
     for (char c2 = 'a'; c2 <= 'q'; c2++)
       for (char c3 = 'a'; c3 <= 'q'; c3++)
@@ -63,6 +63,7 @@ solve_phase_5 (Bomb* bomb)
                     goto done_phase_5;
                   }
               }
+              */
   
 done_phase_5:
   if (bomb->answer[PHASE_5] == NULL)
