@@ -30,8 +30,8 @@ typedef struct
 #define EXPLODE_BOMB      8
 
 #define NUM_OBJECT        2
-#define BOMB_ID           0
-#define INPUT_STRINGS     1
+#define INPUT_STRINGS     0
+#define ARRAY             1
 
 typedef struct
 {

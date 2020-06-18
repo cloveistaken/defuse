@@ -38,32 +38,89 @@ solve_phase_5 (Bomb* bomb)
         }
     }
 
-  /* Case 2: string(6)
-     Very slow to brute force (16^6)
-      => Will not be included in version 0.99
-    
-     Future note: Might need to separated into 2 cases (str->str and str->int)
-     */
+  size_t ptr;
+  size_t begin = bomb->function[PHASE_5].paddr;
+  size_t size = bomb->function[PHASE_5].size;
 
-  /*
-  for (char c1 = 'a'; c1 <= 'q'; c1++)
-    for (char c2 = 'a'; c2 <= 'q'; c2++)
-      for (char c3 = 'a'; c3 <= 'q'; c3++)
-        for (char c4 = 'a'; c4 <= 'q'; c4++)
-          for (char c5 = 'a'; c5 <= 'q'; c5++)
-            for (char c6 = 'a'; c6 <= 'q'; c6++)
-              {
-                snprintf(answer, ANSWER_MAX_LEN + 1, "%c%c%c%c%c%c",
-                         c1, c2, c3, c4, c5, c6);
+  /* Case 2: string(6) -> int array[64] */
+  if (bomb->object[ARRAY].size == 64)
+    {
+      char rev[17];
+      for (int i = 0; i < 64; i += 4)
+        {
+          int value = *(int*) (bomb->original + bomb->object[ARRAY].paddr + i);
+          if (i)
+            rev[value] = (int) 'a' + i / 4 - 1;
+          else
+            rev[value] = 'p';
+#ifdef VERBOSE
+          DEBUG("   i = %d (= '%c') => value = %d", i, rev[value], value);
+#endif
+        }
 
-                if (try_answer(file, answer) == 0)
-                  {
-                    FOUND(answer);
-                    bomb->answer[PHASE_5] = answer;
-                    goto done_phase_5;
-                  }
-              }
-              */
+      for (ptr = begin; ptr < begin + size; ptr++)
+        {
+          if (*(unsigned char*) (bomb->original + ptr) == 0x83)
+            /* cmp r/m16 imm8 or cmp r/m32, imm8 */
+            {
+              int sum = *(unsigned char*) (bomb->original + ptr + 2);
+              if (sum < 6)
+                continue;
+
+              int av = sum / 6;
+              snprintf(answer, ANSWER_MAX_LEN + 1, "%c%c%c%c%c%c",
+                       rev[av], rev[av], rev[av], rev[av], rev[av], rev[sum - 5*av]);
+
+              if (try_answer(file, answer) == 0)
+                {
+                  FOUND(answer);
+                  bomb->answer[PHASE_5] = answer;
+                  goto done_phase_5;
+                }
+            }
+        }
+    }
+
+
+  /* Case 3: string(6) -> char array[16] */
+  if (bomb->object[ARRAY].size == 16)
+    {
+      char rev[26];
+      for (int i = 0; i < 16; i++)
+        {
+          char c = *(bomb->original + bomb->object[ARRAY].paddr + i);
+          if (i)
+            rev[c - 'a'] = (int) 'a' + i - 1;
+          else
+            rev[c - 'a'] = 'p';
+#ifdef VERBOSE
+          DEBUG("   i = %d (= '%c') => c = %c", i, rev[c - 'a'], c);
+#endif
+        }
+
+      for (ptr = begin; ptr < begin + size; ptr++)
+        {
+          if (*(unsigned char*) (bomb->original + ptr) == 0xbe)
+            /* mov esi - Similar to phase 1*/
+            {
+              ptr = *(unsigned int*) (bomb->original + ptr + 1) - bomb->section[RODATA].offset;
+              char t[6];
+              memcpy(t, bomb->original + ptr, 6);
+
+              snprintf(answer, ANSWER_MAX_LEN + 1, "%c%c%c%c%c%c",
+                       rev[t[0] - 'a'], rev[t[1] - 'a'], rev[t[2] - 'a'],
+                       rev[t[3] - 'a'], rev[t[4] - 'a'], rev[t[5] - 'a']);
+
+              if (try_answer(file, answer) == 0)
+                {
+                  FOUND(answer);
+                  bomb->answer[PHASE_5] = answer;
+                  goto done_phase_5;
+                }
+            }
+        }
+    }
+
   
 done_phase_5:
   if (bomb->answer[PHASE_5] == NULL)

@@ -110,8 +110,8 @@ parse_bomb (char* addr, Bomb* bomb)
   };
 
   char* object_name[] = {
-      "bomb_id",
       "input_strings",
+      "array",
   };
 
   memcpy(&hdr, addr, sizeof(hdr));
@@ -205,7 +205,8 @@ parse_bomb (char* addr, Bomb* bomb)
         {
           for (int j = 0; j < NUM_OBJECT; j++)
             {
-              if (strcmp(table_st_name + sym.st_name, object_name[j]) == 0)
+              /* This is for phase 5 */
+              if (strncmp(table_st_name + sym.st_name, object_name[j], strlen(object_name[j])) == 0)
                 {
                   bomb->object[j].laddr = sym.st_value;
 
