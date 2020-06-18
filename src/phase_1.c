@@ -31,7 +31,7 @@ solve_phase_1 (Bomb* bomb)
   for (ptr = begin; ptr < begin + size; ptr++)
     {
       if (*(unsigned char*) (bomb->original + ptr) == 0xbe)
-        /* mov ... %esi */
+        /* mov esi <- ... - Should work on 64-bits */
         {
           ptr += 1;
           /* ptr now should point to the string

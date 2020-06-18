@@ -25,20 +25,20 @@ solve_phase_3 (Bomb* bomb)
 
   /* Generating possible answers here */
 
-  /* Case 1: %d %d - Find mov eax instruction */
   size_t ptr;
   size_t begin = bomb->function[PHASE_3].paddr;
   size_t size = bomb->function[PHASE_3].size;
 
+  /* Case 1: %d %d - Find mov eax instruction */
   for (ptr = begin; ptr < begin + size; ptr++)
     {
       if (*(unsigned char*) (bomb->original + ptr) == 0xb8)
         /* mov eax <- ... => Very compiler-dependent */
         {
-          int guess = *(int*) (bomb->original + ptr + 1);
+          unsigned int guess = *(unsigned int*) (bomb->original + ptr + 1);
           for (int i = 0; i <= 7; i++)
             {
-              snprintf(answer, ANSWER_MAX_LEN + 1, "%d %d", i, guess);
+              snprintf(answer, ANSWER_MAX_LEN + 1, "%u %u", i, guess);
 
               if (try_answer(file, answer) == 0)
                 {
@@ -49,6 +49,30 @@ solve_phase_3 (Bomb* bomb)
             }
         }
     }
+  
+  /* Case 2: %d %c %d - Find cmp ..., ... instruction */
+  for (ptr = begin; ptr < begin + size; ptr++)
+    {
+      if (*(unsigned char*) (bomb->original + ptr) == 0x81)
+        /* cmp r/m16 imm16 or cmp r/m32, imm32 */
+        {
+          int guess = *(short*) (bomb->original + ptr + 4); // Maybe I should consider +1 as well
+          for (int i = 0; i <= 7; i++)
+            for (char c = 'a'; c <= 'z'; c++)
+              {
+                snprintf(answer, ANSWER_MAX_LEN + 1, "%d %c %d", i, c, guess);
+
+                if (try_answer(file, answer) == 0)
+                  {
+                    FOUND(answer);
+                    bomb->answer[PHASE_3] = answer;
+                    goto done_phase_3;
+                  }
+              }
+        }
+    }
+
+  exit(10);
 
   /* Case 1: %d %d - Raw brute-force (Slow) */
   for (int i = 0; i <= 7; i++)
