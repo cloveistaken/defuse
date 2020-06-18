@@ -8,7 +8,7 @@
 Defuse is a solver for the Binary Bomb Lab from the book CS:APP2e, Carnegie Mellon University.
 The program uses static analysis combined with brute-forcing to find the answer for all 6 phases of the bomb.
 
-__Curent version: 0.99__: Works well with phase 1, 2, 3, 4, 6 and some cases of phase 5 (WIP for version 1.0).
+__Curent version: 0.99__: Passes all current tests, need to test from more sources
 
 
 ### Install
