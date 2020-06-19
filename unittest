@@ -1,0 +1,26 @@
+#!/bin/bash
+
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+RESET='\033[0m'
+
+BINARY=bin/defuse
+TEST_DIR=test/*
+
+good() {
+  echo -e "${GREEN}${1}${RESET}"
+}
+
+bad() {
+  echo -e "${RED}${1}${RESET}"
+}
+
+good "[*] Recompiling stuffs"
+make remake
+
+for f in $TEST_DIR; do
+  good "[*] Processing $f"
+
+  $BINARY "$f" 1>/dev/null
+  exit
+done
