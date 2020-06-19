@@ -6,6 +6,7 @@ RESET='\033[0m'
 
 BINARY=bin/defuse
 TEST_DIR=test/*
+OUTPUT_TMP=tmp/hello_world
 
 good() {
   echo -e "${GREEN}${1}${RESET}"
@@ -15,12 +16,27 @@ bad() {
   echo -e "${RED}${1}${RESET}"
 }
 
+set -e
+
 good "[*] Recompiling stuffs"
 make remake
 
 for f in $TEST_DIR; do
   good "[*] Processing $f"
 
-  $BINARY "$f" 1>/dev/null
-  exit
+  "$BINARY" "$f" 2>&1 1>/dev/null | tee "$OUTPUT_TMP"
+
+  if [ $? -ne 0 ]; then
+    bad "Unit test failed: Solver exit with status non-zero."
+    continue
+  fi
+
+  if grep -q 'ERROR' "$OUTPUT_TMP"; then
+    bad "Unit test failed: Solver can't find the solution."
+    continue
+  fi
+
+  good "Unit test passed."
+
+  rm -f "$OUTPUT_TMP"
 done
