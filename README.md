@@ -57,6 +57,11 @@ I'm sorry to hear that.
 As I mentioned above, the solver doesn't do anything fancy aside from brute-forcing.
 This means your bomb might be an edge case that I haven't seen, I'd love to see it so I could improve this program.
 
+#### My bomb has more than 6 phases
+
+From what I've seen, there are variants of the original assignment from CMU.
+Unfortunately, I'm not familiar with such versions in any means, and this solver is created with the intention of solving the 6-phase version only.
+
 
 ### Disclaimer
 
