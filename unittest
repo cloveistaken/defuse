@@ -18,10 +18,17 @@ bad() {
 
 set -e
 
+if ! [[ -d "$TEST_DIR" ]]; then
+  bad "[-] Test folder '$TEST_DIR' does not exist - Note that for multiple reasons, testing bombs shouldn't be shared over public repo."
+  bad "If you are a developer, you should have this folder already."
+  bad "If you are not, we are always looking for more samples to further improve the solver."
+  exit 1
+fi
+
 good "[*] Recompiling stuffs"
 make remake
 
-for f in $TEST_DIR; do
+for f in "$TEST_DIR"; do
   good "[*] Processing $f"
 
   "$BINARY" "$f" 2>&1 1>/dev/null | tee "$OUTPUT_TMP"
